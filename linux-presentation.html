@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux-Präsentation</title>
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/black.css">
+  <style>
+    /* Verbesserte Struktur und ausgewogene Größenverhältnisse */
+    :root {
+      --accent-color: #268bd2;
+      --highlight-bg: rgba(38, 139, 210, 0.15);
+      --section-bg: rgba(255, 255, 255, 0.08);
+      --header-color: #d33682;
+    }
+
+    /* Vollbild-Optimierung */
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .reveal {
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    .reveal .slides {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .reveal .slides section {
+      padding: 1.5vh 2vw;
+      text-align: left;
+      width: 96vw;
+      height: 98vh;
+      max-width: none;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Responsive Schriftgrößen - Größer und dynamischer */
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      margin-bottom: 0.5em;
+      color: var(--header-color);
+      text-align: left;
+      text-transform: none;
+      font-family: 'Segoe UI', Helvetica, sans-serif;
+      line-height: 1.2;
+    }
+
+    .reveal h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      border-bottom: 3px solid var(--accent-color);
+      padding-bottom: 1vh;
+    }
+    .reveal h2 {
+      font-size: clamp(2rem, 4.5vw, 3rem);
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.8vh;
+    }
+    .reveal h3 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      color: var(--accent-color);
+    }
+    .reveal h4 {
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      color: #eee;
+      font-weight: 600;
+      margin-bottom: 0.3em;
+    }
+
+    /* Responsive Textgrößen - Größer */
+    .reveal p, .reveal li {
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      line-height: 1.5;
+      margin-bottom: 0.6em;
+    }
+
+    /* Listen mit dynamischen Abständen */
+    .reveal ul, .reveal ol {
+      display: block;
+      margin: 0 0 1.2em 1.5em;
+    }
+
+    .reveal li {
+      margin-bottom: 0.8em;
+    }
+
+    /* Optimiertes Zwei-Spalten-Layout - Dynamisch */
+    .two-column {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2vh;
+      gap: 3vw;
+      align-items: flex-start;
+      height: auto;
+      min-height: 40vh;
+    }
+
+    .column {
+      width: 47%;
+      flex: 1;
+    }
+
+    /* Dynamische Container-Größen */
+    .section-box {
+      background-color: var(--section-bg);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 8px;
+      padding: clamp(12px, 2vh, 24px) clamp(16px, 2.5vw, 28px);
+      margin-bottom: clamp(15px, 2vh, 25px);
+      min-height: clamp(80px, 12vh, 140px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .section-box h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .section-box p, .section-box ul {
+      margin-bottom: 0;
+    }
+
+    /* Bild-Container mit dynamischen Größen */
+    .image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 2vh 0;
+    }
+
+    /* Vollständig responsive Bildgrößen */
+    .logo-standard {
+      height: clamp(50px, 8vh, 100px);
+      background: none;
+      border: none;
+      box-shadow: none;
+    }
+
+    .logo-diagram {
+      max-height: clamp(120px, 20vh, 200px);
+      max-width: 85%;
+      background: none;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Dynamisches Distributionen-Grid */
+    .distro-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(15px, 2vw, 30px);
+      margin-top: 3vh;
+    }
+
+    .distro-item {
+      text-align: center;
+      width: clamp(100px, 12vw, 140px);
+      height: clamp(100px, 12vw, 140px);
+      background-color: var(--section-bg);
+      border-radius: 10px;
+      padding: clamp(10px, 1.5vw, 20px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .distro-item:hover {
+      transform: translateY(-3px);
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .distro-item p {
+      margin: clamp(6px, 1vh, 12px) 0 0 0;
+      font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+      font-weight: 500;
+    }
+
+    .distro-item img {
+      height: clamp(35px, 6vh, 60px) !important;
+    }
+
+    /* Inhaltsverzeichnis - Dynamisch */
+    .toc {
+      columns: 2;
+      column-gap: 4vw;
+      margin-top: 2vh;
+    }
+
+    .toc ol {
+      margin-left: 0;
+      padding-left: 2vw;
+    }
+
+    .toc li {
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      margin-bottom: 1em;
+      line-height: 1.4;
+    }
+
+    /* Hervorhebungen */
+    .accent {
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    /* Titelfolie zentriert */
+    .title-slide {
+      text-align: center;
+    }
+
+    .title-slide h1, .title-slide h3 {
+      text-align: center;
+      border: none;
+    }
+
+    .title-slide h1 {
+      font-size: clamp(2.8rem, 7vw, 4.5rem);
+      margin-bottom: 0.3em;
+    }
+
+    .title-slide h3 {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: #aaa;
+      font-weight: 300;
+    }
+
+    /* Kapitelüberschriften */
+    .chapter-title {
+      border-bottom: 3px solid var(--accent-color);
+      padding-bottom: 12px;
+      margin-bottom: 25px;
+    }
+
+    /* Spezielle Anpassungen für verschiedene Sektionen */
+    .quote-box {
+      background-color: var(--section-bg);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin: 20px 0;
+      font-style: italic;
+    }
+
+    .stats-highlight {
+      text-align: center;
+      background-color: var(--highlight-bg);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+      border: 1px solid var(--accent-color);
+    }
+
+    .stats-highlight .accent {
+      font-size: 1.2em;
+    }
+
+    /* Responsive Anpassungen - Erweitert */
+    @media (max-width: 1200px) {
+      .two-column {
+        gap: 2.5vw;
+        min-height: 35vh;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .reveal .slides section {
+        padding: 1.2vh 1.8vw;
+      }
+
+      .two-column {
+        flex-direction: column;
+        gap: 2vh;
+        min-height: auto;
+      }
+
+      .column {
+        width: 100%;
+      }
+
+      .distro-container {
+        gap: 2vw;
+      }
+
+      .distro-item {
+        width: clamp(90px, 15vw, 120px);
+        height: clamp(90px, 15vw, 120px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .reveal .slides section {
+        padding: 1vh 1.5vw;
+      }
+
+      .distro-item {
+        width: clamp(80px, 20vw, 110px);
+        height: clamp(80px, 20vw, 110px);
+      }
+
+      .toc {
+        columns: 1;
+      }
+
+      .section-box {
+        min-height: clamp(60px, 10vh, 100px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .distro-item {
+        width: clamp(70px, 35vw, 100px);
+        height: clamp(70px, 35vw, 100px);
+      }
+
+      .distro-container {
+        gap: 3vw;
+      }
+    }
+
+    /* Landscape Tablet Optimierung */
+    @media (max-height: 600px) and (min-width: 800px) {
+      .reveal .slides section {
+        justify-content: flex-start;
+      }
+
+      .two-column {
+        min-height: 30vh;
+      }
+
+      .section-box {
+        min-height: 8vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- Titelfolie -->
+      <section>
+        <div class="title-slide">
+          <h1>Die Welt von Linux</h1>
+          <h3>Eine Einführung in das Open-Source-Betriebssystem</h3>
+          <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Linux Logo" style="height: 100px; margin-top: 30px;">
+          </div>
+        </div>
+      </section>
+
+      <!-- Inhaltsverzeichnis -->
+      <section>
+        <h2 class="chapter-title" style="text-align: center;">Inhalt</h2>
+        <div class="toc" style="display: flex; justify-content: center;">
+          <ol style="list-style-position: inside; text-align: left; margin: 0; padding: 0;">
+            <li>Betriebssysteme</li>
+            <li>Kernel</li>
+            <li>Was ist Linux?</li>
+            <li>Was ist GNU?</li>
+            <li>Warum/wofür benutzt man Linux?</li>
+            <li>Distributionsarten</li>
+            <li>Server-Systeme</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 1. Betriebssysteme -->
+      <section>
+        <h2 class="chapter-title">1. Betriebssysteme</h2>
+        <p>Ein <span class="accent">Betriebssystem</span> ist die grundlegende Software, die:</p>
+        <div class="two-column">
+          <div class="column">
+            <ul>
+              <li class="fragment">Hardware-Ressourcen verwaltet</li>
+              <li class="fragment">Schnittstelle zwischen Hardware und Anwendungen bildet</li>
+              <li class="fragment">Grundlegende Dienste bereitstellt</li>
+              <li class="fragment">Systemressourcen koordiniert</li>
+            </ul>
+          </div>
+          <div class="column">
+            <div class="image-container">
+              <img class="logo-diagram" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Operating_system_placement-de.svg/500px-Operating_system_placement-de.svg.png" alt="Betriebssystem-Diagramm" style="max-width: 400px; margin: 0 auto;">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Hauptkomponenten eines Betriebssystems</h3>
+        <div class="two-column">
+          <div class="column">
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Kernel Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Kernel</h4>
+              <p>Zentraler Bestandteil, verwaltet Hardware-Zugriff und Systemressourcen</p>
+            </div>
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/folder2-open.svg" alt="Dateisystem Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Dateisystem</h4>
+              <p>Organisation und Verwaltung von Daten auf Speichermedien</p>
+            </div>
+          </div>
+          <div class="column">
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/plug.svg" alt="Gerätetreiber Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Gerätetreiber</h4>
+              <p>Steuern die Kommunikation zwischen Hardware und Software</p>
+            </div>
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/pc-display.svg" alt="Benutzeroberfläche Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Benutzeroberfläche</h4>
+              <p>Shell (CLI) oder grafische Oberfläche (GUI) für Benutzerinteraktion</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Kernel -->
+      <section>
+        <h2 class="chapter-title">2. Kernel</h2>
+        <p>Der <span class="accent">Kernel</span> ist das Herzstück eines Betriebssystems:</p>
+        <div class="two-column">
+          <div class="column">
+            <ul>
+              <li class="fragment">Direkter Zugriff auf die Hardware</li>
+              <li class="fragment">Speicherverwaltung</li>
+              <li class="fragment">Prozessverwaltung</li>
+              <li class="fragment">Gerätesteuerung</li>
+              <li class="fragment">Systemsicherheit</li>
+            </ul>
+          </div>
+          <div class="column">
+            <div class="image-container stats-highlight" style="background-color: var(--highlight-bg); border: 2px solid var(--accent-color);">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Kernel_Layout.svg/380px-Kernel_Layout.svg.png" alt="Kernel Layout" class="logo-diagram">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Arten von Kernels</h3>
+        <div class="two-column">
+          <div class="column">
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Monolithisch Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Monolithischer Kernel</h4>
+              <p>Alle Systemdienste laufen im Kernelspace (z.B. Linux)</p>
+            </div>
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/boxes.svg" alt="Microkernel Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Microkernel</h4>
+              <p>Minimaler Kern, Dienste im Userspace (z.B. MINIX)</p>
+            </div>
+          </div>
+          <div class="column">
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/layers.svg" alt="Hybrid Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Hybrider Kernel</h4>
+              <p>Kombination beider Ansätze (z.B. Windows NT)</p>
+            </div>
+            <div class="section-box fragment">
+              <h4><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg" alt="Exokernel Icon" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);"> Exokernel</h4>
+              <p>Minimaler Ressourcenschutz, maximale Anwendungskontrolle</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Was ist Linux? -->
+      <section>
+        <h2 class="chapter-title">3. Was ist Linux?</h2>
+        <div class="two-column">
+          <div class="column">
+            <div class="section-box fragment">
+              <h4 style="color: var(--accent-color); margin-bottom: 0.7em;">
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/globe2.svg" alt="Globus" style="height: 1.2em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);">
+                Linux weltweit
+              </h4>
+            <ul>
+                <li class="fragment">1991 von <strong>Linus Torvalds</strong> gestartet</li>
+                <li class="fragment">Heute auf Supercomputern, Smartphones, Servern und in der Raumfahrt</li>
+                <li class="fragment">Open Source: Jeder kann mitmachen</li>
+            </ul>
+            </div>
+            <div class="quote-box fragment" style="margin-top: 1em;">
+              „ Linux ist wie ein Baukasten – du bestimmst, was daraus wird! “
+            </div>
+          </div>
+          <div class="column">
+            <div class="image-container" style="flex-direction: column;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Tux, das Linux-Maskottchen" class="logo-diagram" style="margin-bottom: 10px;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/World_map_blank_without_borders.svg/800px-World_map_blank_without_borders.svg.png" alt="Weltkarte" style="max-width: 80%; border-radius: 10px; box-shadow: 0 2px 12px rgba(38,139,210,0.10);">
+            </div>
+            <div style="text-align: center; margin-top: 10px;">
+              <span class="accent fragment">Über 90% der Cloud-Infrastruktur läuft auf Linux!</span>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Linux-Entwicklung</h3>
+        <div class="quote-box fragment" style="display: flex; align-items: center; gap: 18px;">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Linus_Torvalds_%28cropped%29.jpg" alt="Linus Torvalds Foto" style="height: 70px; border-radius: 8px; box-shadow: 0 2px 8px rgba(38,139,210,0.15);">
+          <p style="margin: 0;">
+            <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/person.svg" alt="Linus Torvalds" style="height: 1.2em; vertical-align: middle; margin-right: 6px; filter: invert(1) brightness(2);">
+            "Ich mache nur einen Hobby-Kernel, der nie professionell und groß wird..." <br>
+            <strong>- Linus Torvalds, 1991</strong>
+          </p>
+        </div>
+        <div class="section-box fragment">
+          <h4>
+            <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/award.svg" alt="Erfolg" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+            Heute ist Linux:
+          </h4>
+          <div class="two-column" style="margin-top: 10px;">
+            <div class="column" style="flex: 2;">
+              <ul style="margin: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/code-slash.svg" alt="Code" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Über 30 Millionen Codezeilen
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/people.svg" alt="Entwickler" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Tausende Entwickler weltweit
+                </li>
+              </ul>
+            </div>
+            <div class="column" style="flex: 1;">
+              <ul style="margin: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Supercomputer" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Über 90% der Supercomputer
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/phone.svg" alt="Smartphones" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Über 80% der Smartphones (Android)
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Was ist GNU? -->
+      <section>
+        <h2 class="chapter-title">4. Was ist GNU?</h2>
+        <div class="two-column">
+          <div class="column">
+            <p><span class="accent">GNU</span> (GNU's Not Unix) ist ein Projekt für freie Software:</p>
+            <ul>
+              <li class="fragment">1983 von Richard Stallman gestartet</li>
+              <li class="fragment">Ziel: Komplettes freies Unix-ähnliches OS</li>
+              <li class="fragment">Entwickelte wichtige Systemtools</li>
+              <li class="fragment">Basis der Freie-Software-Bewegung</li>
+            </ul>
+          </div>
+          <div class="column fragment">
+            <div class="image-container">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Heckert_GNU_white.svg/535px-Heckert_GNU_white.svg.png" alt="GNU Logo" class="logo-diagram">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>GNU/Linux</h3>
+        <p>Ein vollständiges Linux-Betriebssystem ist eigentlich <span class="accent">GNU/Linux</span>:</p>
+        <div class="two-column">
+          <div class="column fragment">
+            <div class="section-box">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Kernel" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                Linux-Beitrag
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Kernel" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Kernel (Systemkern)
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/plug.svg" alt="Gerätetreiber" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Gerätetreiber
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg" alt="Prozessmanagement" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Prozessmanagement
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/hdd.svg" alt="Speicherverwaltung" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Speicherverwaltung
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="column fragment">
+            <div class="section-box">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/gear.svg" alt="GNU" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                GNU-Beitrag
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/terminal.svg" alt="Bash" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Bash (Shell)
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/code-slash.svg" alt="GCC" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  GCC (Compiler)
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/tools.svg" alt="Coreutils" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Coreutils (Basiswerkzeuge)
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/boxes.svg" alt="glibc" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Bibliotheken (glibc)
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Warum/wofür benutzt man Linux? -->
+      <section>
+        <h2 class="chapter-title">5. Warum/wofür benutzt man Linux?</h2>
+        <div class="two-column">
+          <div class="column">
+            <div class="section-box fragment">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/star.svg" alt="Vorteile" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                Hauptvorteile
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/unlock.svg" alt="Open Source" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Open Source & kostenlos
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/shield-check.svg" alt="Sicherheit" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Hohe Sicherheit & Stabilität
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/sliders.svg" alt="Anpassbar" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Vollständig anpassbar
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Effizient" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Ressourceneffizient
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/people.svg" alt="Community" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Große Community
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="column">
+            <div class="section-box fragment">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg" alt="Anwendungsbereiche" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                Anwendungsbereiche
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cloud.svg" alt="Server" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Server & Cloud Computing
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" alt="Embedded" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Embedded Systems & IoT
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/graph-up.svg" alt="Supercomputer" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Supercomputer
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/laptop.svg" alt="Desktop" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Desktop & Entwicklung
+                </li>
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/phone.svg" alt="Mobile" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Mobile Geräte
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Linux in der Praxis</h3>
+        <div class="distro-container">
+          <div style="display: flex; width: 100%; gap: 2vw; justify-content: center;">
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Android_robot.svg/511px-Android_robot.svg.png" alt="Android" style="height: 45px;">
+            <p>Smartphones</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Red_Hat_logo.svg/640px-Red_Hat_logo.svg.png" alt="Red Hat" style="height: 35px;">
+            <p>Enterprise</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/de/thumb/c/cb/Raspberry_Pi_Logo.svg/250px-Raspberry_Pi_Logo.svg.png" alt="Raspberry Pi" style="height: 45px;">
+            <p>IoT & Embedded</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Tesla_Motors.svg/250px-Tesla_Motors.svg.png" alt="Tesla" style="height: 45px;">
+            <p>Automotive</p>
+          </div>
+          </div>
+          <div style="display: flex; width: 100%; gap: 2vw; justify-content: center; margin-top: 2vh;">
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/UbuntuCoF.svg/512px-UbuntuCoF.svg.png" alt="Ubuntu" style="height: 40px;">
+            <p>Desktop</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fedora_logo.svg/267px-Fedora_logo.svg.png" alt="Fedora" style="height: 35px;">
+            <p>Workstation</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Openlogo-debianV2.svg/640px-Openlogo-debianV2.svg.png" alt="Debian" style="height: 40px;">
+            <p>Server</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Arch_Linux_%22Crystal%22_icon.svg/640px-Arch_Linux_%22Crystal%22_icon.svg.png" alt="Arch" style="height: 40px;">
+            <p>Power User</p>
+          </div>
+          </div>
+          <div style="display: flex; width: 100%; gap: 2vw; justify-content: center; margin-top: 2vh;">
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/640px-Steam_icon_logo.svg.png" alt="Steam Deck" style="height: 40px;">
+            <p>Gaming</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Deepin_Icon_Theme_%E2%80%93_deepin-cloud-print-configurator_%2814%29.svg/640px-Deepin_Icon_Theme_%E2%80%93_deepin-cloud-print-configurator_%2814%29.svg.png" alt="Cloud" style="height: 40px;">
+            <p>Cloud</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Distributionsarten -->
+      <section>
+        <h2 class="chapter-title">6. Distributionsarten</h2>
+        <p>Eine Linux-<span class="accent">Distribution</span> ist ein komplettes Betriebssystem auf Basis des Linux-Kernels</p>
+        <div class="two-column">
+          <div class="column fragment">
+            <div class="section-box">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg" alt="Familien Icon" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                Hauptfamilien
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Openlogo-debianV2.svg" alt="Debian" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                  Debian-basiert (Ubuntu, Mint)
+                </li>
+                <li>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Red_Hat_logo.svg" alt="Red Hat" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                  Red Hat-basiert (Fedora, CentOS)
+                </li>
+                <li>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/1/13/Arch_Linux_%22Crystal%22_icon.svg" alt="Arch" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                  Arch-basiert (Manjaro)
+                </li>
+                <li>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/OpenSUSE_Button.svg/640px-OpenSUSE_Button.svg.png" alt="SUSE" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                  SUSE-basiert (openSUSE)
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="column fragment">
+            <div class="section-box">
+              <h4>
+                <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/people.svg" alt="Zielgruppen Icon" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                Zielgruppen
+              </h4>
+              <ul style="margin-bottom: 0;">
+                <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/laptop.svg" alt="Desktop" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Desktop-Benutzer
+                </li>
+                <li>
+                    <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/server.svg" alt="Server" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Server-Administratoren
+                </li>
+                <li>
+                    <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/code-slash.svg" alt="Entwickler" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Entwickler
+                </li>
+                <li>
+                    <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/tools.svg" alt="Spezialanwendungen" style="height: 1em; vertical-align: middle; margin-right: 5px; filter: invert(1) brightness(2);">
+                  Spezialanwendungen
+                  </li>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>Beliebte Linux-Distributionen</h3>
+        <div class="distro-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(15px, 2vw, 30px); justify-items: center;">
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/UbuntuCoF.svg/512px-UbuntuCoF.svg.png" alt="Ubuntu" />
+            <p>Ubuntu</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fedora_logo.svg/267px-Fedora_logo.svg.png" alt="Fedora" />
+            <p>Fedora</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Openlogo-debianV2.svg/640px-Openlogo-debianV2.svg.png" alt="Debian" />
+            <p>Debian</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Arch_Linux_%22Crystal%22_icon.svg/640px-Arch_Linux_%22Crystal%22_icon.svg.png" alt="Arch Linux" />
+            <p>Arch Linux</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Linux_Mint_logo_without_wordmark.svg/640px-Linux_Mint_logo_without_wordmark.svg.png" alt="Linux Mint" />
+            <p>Linux Mint</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Manjaro-logo.svg/640px-Manjaro-logo.svg.png" alt="Manjaro" />
+            <p>Manjaro</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/OpenSUSE_Button.svg/640px-OpenSUSE_Button.svg.png" alt="openSUSE" />
+            <p>openSUSE</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/CentOS_Linux_color_logo_%282020%29.svg/640px-CentOS_Linux_color_logo_%282020%29.svg.png" alt="CentOS" />
+            <p>CentOS</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Elementary_logo.svg/640px-Elementary_logo.svg.png" alt="elementary OS" />
+            <p>elementary OS</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Kali-dragon-icon.svg/640px-Kali-dragon-icon.svg.png" alt="Kali Linux" />
+            <p>Kali Linux</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Slackware_logo.svg/640px-Slackware_logo.svg.png" alt="Slackware" />
+            <p>Slackware</p>
+          </div>
+          <div class="fragment distro-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/New_Logo_Alpine_Linux.svg/640px-New_Logo_Alpine_Linux.svg.png" alt="Alpine Linux" />
+            <p>Alpine Linux</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Server-Systeme -->
+      <section>
+        <h2 class="chapter-title">7. Server-Systeme</h2>
+        <p>Linux dominiert den Server-Markt aufgrund seiner Zuverlässigkeit und Skalierbarkeit</p>
+        <div class="two-column" style="align-items: stretch;">
+          <div class="column fragment">
+            <div class="section-box" style="height: 100%;">
+                <h4>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/server.svg" alt="Server Icon" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  Server-Distributionen
+                </h4>
+              <ul style="margin-bottom: 0;">
+                  <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/UbuntuCoF.svg" alt="Ubuntu" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                    Ubuntu Server
+                  </li>
+                  <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d8/Red_Hat_logo.svg" alt="Red Hat" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                    Red Hat Enterprise Linux
+                  </li>
+                  <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/CentOS_Linux_color_logo_%282020%29.svg" alt="CentOS" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                    CentOS / Rocky Linux
+                  </li>
+                  <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/Openlogo-debianV2.svg" alt="Debian" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                    Debian
+                  </li>
+                  <li>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/OpenSUSE_Button.svg/640px-OpenSUSE_Button.svg.png" alt="SUSE" style="height: 1em; vertical-align: middle; margin-right: 5px;">
+                    SUSE Linux Enterprise
+                  </li>
+              </ul>
+            </div>
+          </div>
+          <div class="column fragment">
+            <div class="section-box" style="height: 100%;">
+                <h4>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/gear.svg" alt="Anwendungen Icon" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  Serveranwendungen
+                </h4>
+              <ul style="margin-bottom: 0; list-style: none; padding-left: 0;">
+                <li style="margin-bottom: 0.5em;">
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/globe.svg" alt="Webserver" style="height: 1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  <span style="font-weight: 500;">Webserver</span> <span style="color: #aaa;">(Apache, Nginx)</span>
+                  </li>
+                <li style="margin-bottom: 0.5em;">
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/database.svg" alt="Datenbanken" style="height: 1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  <span style="font-weight: 500;">Datenbanken</span> <span style="color: #aaa;">(MySQL, PostgreSQL)</span>
+                  </li>
+                <li style="margin-bottom: 0.5em;">
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/boxes.svg" alt="Virtualisierung" style="height: 1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  <span style="font-weight: 500;">Virtualisierung</span> <span style="color: #aaa;">(KVM, Docker)</span>
+                  </li>
+                <li style="margin-bottom: 0.5em;">
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cloud.svg" alt="Cloud" style="height: 1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  <span style="font-weight: 500;">Cloud-Infrastruktur</span>
+                  </li>
+                  <li>
+                  <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg" alt="Netzwerkdienste" style="height: 1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+                  <span style="font-weight: 500;">Netzwerkdienste</span>
+                  </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>
+          <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/briefcase.svg" alt="Business" style="height: 1.1em; vertical-align: middle; margin-right: 8px; filter: invert(1) brightness(2);">
+          Linux im professionellen Umfeld
+        </h3>
+        <div class="section-box fragment" style="background: linear-gradient(90deg, var(--section-bg) 80%, rgba(38,139,210,0.08)); box-shadow: 0 2px 12px rgba(38,139,210,0.08);">
+          <h4 style="display: flex; align-items: center;">
+            <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/trophy.svg" alt="Trophy" style="height: 1.1em; vertical-align: middle; margin-right: 7px; filter: invert(1) brightness(2);">
+            Vorteile von Linux-Servern
+          </h4>
+          <div class="two-column" style="margin-top: 10px;">
+            <div class="column">
+              <ul style="margin-bottom: 0;">
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/clock-history.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Hohe Stabilität & Uptime</li>
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cash-coin.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Geringere Lizenzkosten</li>
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/shield-lock.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Starke Sicherheitsfunktionen</li>
+              </ul>
+            </div>
+            <div class="column">
+              <ul style="margin-bottom: 0;">
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/arrows-expand.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Hervorragende Skalierbarkeit</li>
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cpu.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Effiziente Ressourcennutzung</li>
+                <li><img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/people.svg" style="height:1em;vertical-align:middle;margin-right:5px;filter:invert(1) brightness(2);"> Aktive Entwickler-Community</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="stats-highlight fragment" style="display: flex; align-items: center; justify-content: center; gap: 18px;">
+          <img src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/cloud.svg" alt="Cloud" style="height: 2em; filter: invert(1) brightness(2);">
+          <span class="accent" style="font-size: 1.25em;">
+            Über 90% der Top-Websites und Cloud-Dienste laufen auf Linux-Servern
+          </span>
+        </div>
+      </section>
+
+      <!-- Abschlussfolie -->
+      <section>
+        <h2 class="chapter-title" style="text-align: center; font-size: 2.2em; letter-spacing: 0.02em;">
+          ✨ Zusammenfassung
+        </h2>
+        <div class="section-box" style="background: linear-gradient(100deg, var(--section-bg) 70%, rgba(38,139,210,0.13)); box-shadow: 0 4px 24px rgba(38,139,210,0.13); border-radius: 18px; padding: 2.5em 2em;">
+          <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 40px;">
+            <div style="flex: 2 1 340px;">
+              <ul style="font-size: 1.25em; line-height: 1.7; margin: 0 0 0 1em;">
+            <li class="fragment"><span class="accent">Linux</span> ist der <b>Kernel</b> – mit <span class="accent">GNU</span>-Tools wird daraus ein vollständiges Betriebssystem</li>
+            <li class="fragment">Frei, <b>quelloffen</b> & mit einer starken, globalen Community</li>
+            <li class="fragment">Enorme <b>Vielfalt</b> an Distributionen für jeden Zweck</li>
+            <li class="fragment"><b>Dominiert</b> Server, Cloud, Embedded & Supercomputer</li>
+            <li class="fragment">Bietet <span class="accent">Stabilität</span>, <span class="accent">Sicherheit</span> & <span class="accent">Anpassbarkeit</span></li>
+          </ul>
+            </div>
+            <div style="flex: 1 1 200px; display: flex; flex-direction: column; align-items: center; gap: 18px;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" alt="Tux Logo" style="height: 90px; filter: drop-shadow(0 2px 8px rgba(38,139,210,0.10));">
+              <div class="stats-highlight fragment" style="margin: 0; background: rgba(38,139,210,0.07); border-radius: 10px; border: 1.5px solid var(--accent-color); padding: 0.7em 1.2em;">
+              <span class="accent" style="font-size: 1.3em;">Noch Fragen?<br>📝</span>
+              </div>
+        </div>
+        </div>
+        </div>
+      </section>
+      <section>
+        <h2 class="chapter-title">Quellen &amp; Weiterführende Links</h2>
+        <div class="section-box">
+          <ul>
+            <li><a href="https://www.kernel.org/" target="_blank">kernel.org</a> (Offizielle Linux-Kernel-Seite)</li>
+            <li><a href="https://www.gnu.org/" target="_blank">gnu.org</a> (GNU-Projekt)</li>
+            <li><a href="https://de.wikipedia.org/wiki/Linux" target="_blank">Wikipedia: Linux</a></li>
+            <li><a href="https://www.linuxfoundation.org/" target="_blank">Linux Foundation</a></li>
+            <li>Bilder: Wikimedia Commons</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  <script src="dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      controls: true,
+      progress: true,
+      center: false,
+      hash: true,
+      width: '100%',
+      height: '100%',
+      margin: 0.02,
+      minScale: 0.1,
+      maxScale: 3.0,
+      transition: 'slide',
+      embedded: false,
+      backgroundTransition: 'fade'
+    });
+  </script>
+</body>
+</html>
