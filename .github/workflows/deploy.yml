@@ -1,36 +1,49 @@
-name: Deploy Reveal.js to Mittwald
+name: Deploy to Mittwald
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  workflow_dispatch:  # Erlaubt manuelles Auslösen
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Setup Node.js (für Reveal.js)
+    
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
-
+        node-version: '18'
+    
     - name: Install dependencies
-      run: npm install
-
-    - name: (Optional) Build Reveal.js
-      run: npm run build
-
-    - name: Deploy via SSH to Mittwald
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.MITTWALD_HOST }}
-        username: ${{ secrets.MITTWALD_USER }}
-        key: ${{ secrets.MITTWALD_SSH_KEY }}
-        port: 22
-        source: "dist/*"
-        target: "/html/linux-presentation-x84vt"
-
+      run: |
+        npm install
+        # Falls Sie einen Build-Prozess haben:
+        # npm run build
+    
+    - name: Install sshpass
+      run: sudo apt-get install -y sshpass
+    
+    - name: Test Connection
+      env:
+        SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
+      run: |
+        sshpass -e ssh -o StrictHostKeyChecking=no \
+          ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} \
+          "echo 'Connection successful!'"
+    
+    - name: Deploy to Mittwald
+      env:
+        SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
+      run: |
+        sshpass -e rsync -avz --delete \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude 'node_modules' \
+          --exclude '.DS_Store' \
+          --exclude '.gitignore' \
+          ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}/
