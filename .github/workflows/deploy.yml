@@ -1,9 +1,9 @@
-name: Deploy to Mittwald
+name: Auto-Deploy to Mittwald
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # Erlaubt manuelles Auslösen
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,32 +18,59 @@ jobs:
       with:
         node-version: '18'
     
-    - name: Install dependencies
+    - name: Install and build locally
       run: |
-        npm install
-        # Falls Sie einen Build-Prozess haben:
+        echo "=== Installing dependencies ==="
+        npm ci
+        
+        echo "=== Building project if needed ==="
+        # Falls Sie einen Build-Schritt haben:
         # npm run build
     
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
     
-    - name: Test Connection
+    - name: Deploy and setup everything
       env:
         SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
       run: |
-        sshpass -e ssh -o StrictHostKeyChecking=no \
-          ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} \
-          "echo 'Connection successful!'"
-    
-    - name: Deploy to Mittwald
-      env:
-        SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
-      run: |
+        echo "=== Deploying files to server ==="
+        # Alles hochladen (inklusive node_modules für sofortigen Start)
         sshpass -e rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
           --exclude '.git' \
           --exclude '.github' \
-          --exclude 'node_modules' \
-          --exclude '.DS_Store' \
           --exclude '.gitignore' \
           ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}/
+        
+        echo "=== Setting up auto-start on server ==="
+        # Server-Setup automatisieren
+        sshpass -e ssh -o StrictHostKeyChecking=no \
+          ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} << 'ENDSSH'
+          cd ${{ secrets.MITTWALD_PATH }}
+          
+          # PM2 global installieren falls nicht vorhanden
+          which pm2 || npm install -g pm2
+          
+          # Alte Prozesse beenden
+          pm2 delete reveal-presentation 2>/dev/null || true
+          
+          # Server-Startskript erstellen
+          cat > start-server.sh << 'EOF'
+          #!/bin/bash
+          cd $(dirname "$0")
+          npx gulp serve --port 3000
+          EOF
+          
+          chmod +x start-server.sh
+          
+          # Mit PM2 starten und speichern
+          pm2 start ./start-server.sh --name reveal-presentation
+          pm2 save
+          pm2 startup || true
+          
+          # Status prüfen
+          echo "=== Server Status ==="
+          pm2 status
+          echo "=== Deployment completed successfully! ==="
+        ENDSSH
