@@ -1,0 +1,44 @@
+name: Deploy reveal.js to Mittwald
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        # Falls Sie einen Build-Prozess haben:
+        # npm run build
+    
+    - name: Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.MITTWALD_HOST }} >> ~/.ssh/known_hosts
+    
+    - name: Deploy via rsync
+      run: |
+        rsync -avz --delete \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude 'node_modules' \
+          --exclude '.gitignore' \
+          ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}
+    
+    - name: Cleanup
+      run: rm -rf ~/.ssh/id_rsa
