@@ -1,23 +1,36 @@
-name: Test Connection
+name: Deploy Reveal.js to Mittwald
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Debug SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/deploy_key
-        chmod 600 ~/.ssh/deploy_key
-        
-        # Fingerprint anzeigen
-        ssh-keygen -l -f ~/.ssh/deploy_key
-        
-        # Verbose connection test
-        ssh -vvv -i ~/.ssh/deploy_key \
-          -o StrictHostKeyChecking=no \
-          ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} \
-          "pwd && ls -la"
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js (für Reveal.js)
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: (Optional) Build Reveal.js
+      run: npm run build
+
+    - name: Deploy via SSH to Mittwald
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.MITTWALD_HOST }}
+        username: ${{ secrets.MITTWALD_USER }}
+        key: ${{ secrets.MITTWALD_SSH_KEY }}
+        port: 22
+        source: "dist/*"
+        target: "/html/linux-presentation-x84vt"
+
