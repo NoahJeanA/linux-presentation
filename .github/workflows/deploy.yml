@@ -1,4 +1,4 @@
-name: Deploy reveal.js to Mittwald
+name: Deploy to Mittwald
 
 on:
   push:
@@ -10,27 +10,36 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Setup SSH Key
+    - name: Setup SSH
       run: |
+        # SSH-Verzeichnis erstellen
         mkdir -p ~/.ssh
+        
+        # Private Key speichern
         echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        # Wichtig: SSH-Host-Key automatisch akzeptieren
+        
+        # Host Key speichern (verhindert Prompt)
         ssh-keyscan -H ${{ secrets.MITTWALD_HOST }} >> ~/.ssh/known_hosts
+        
+        # SSH-Config für bessere Kompatibilität
+        echo "Host mittwald" >> ~/.ssh/config
+        echo "  HostName ${{ secrets.MITTWALD_HOST }}" >> ~/.ssh/config
+        echo "  User ${{ secrets.MITTWALD_USER }}" >> ~/.ssh/config
+        echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
+        echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+        chmod 600 ~/.ssh/config
     
-    - name: Test SSH Connection
-      run: |
-        ssh -v ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} "echo 'SSH connection successful'"
+    - name: Test Connection
+      run: ssh mittwald "echo 'Connection successful'"
     
-    - name: Deploy via rsync
+    - name: Deploy
       run: |
         rsync -avz --delete \
-          -e "ssh -o StrictHostKeyChecking=no" \
-          --exclude '.git' \
-          --exclude '.github' \
-          --exclude 'node_modules' \
-          --exclude '.gitignore' \
-          ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}
+          --exclude='.git' \
+          --exclude='.github' \
+          --exclude='node_modules' \
+          ./ mittwald:${{ secrets.MITTWALD_PATH }}
