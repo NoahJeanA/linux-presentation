@@ -3,43 +3,54 @@ name: Deploy to Mittwald
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch:  # Erlaubt manuelles Auslösen
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        # Falls Sie einen Build-Prozess haben:
+        # npm run build
     
     - name: Setup SSH
       run: |
         # SSH-Verzeichnis erstellen
         mkdir -p ~/.ssh
         
-        # Private Key speichern
-        echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        # Privaten Schlüssel speichern
+        echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
         
-        # Host Key speichern (verhindert Prompt)
+        # SSH bekannt machen
         ssh-keyscan -H ${{ secrets.MITTWALD_HOST }} >> ~/.ssh/known_hosts
-        
-        # SSH-Config für bessere Kompatibilität
-        echo "Host mittwald" >> ~/.ssh/config
-        echo "  HostName ${{ secrets.MITTWALD_HOST }}" >> ~/.ssh/config
-        echo "  User ${{ secrets.MITTWALD_USER }}" >> ~/.ssh/config
-        echo "  IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config
-        echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-        chmod 600 ~/.ssh/config
     
-    - name: Test Connection
-      run: ssh mittwald "echo 'Connection successful'"
-    
-    - name: Deploy
+    - name: Test SSH Connection
       run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} "echo 'SSH Connection successful!'"
+    
+    - name: Deploy to Mittwald
+      run: |
+        # Alle Dateien zum Server kopieren
         rsync -avz --delete \
-          --exclude='.git' \
-          --exclude='.github' \
-          --exclude='node_modules' \
-          ./ mittwald:${{ secrets.MITTWALD_PATH }}
+          -e "ssh -i ~/.ssh/deploy_key" \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude 'node_modules' \
+          --exclude '.DS_Store' \
+          ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}/
+    
+    - name: Cleanup
+      if: always()
+      run: rm -f ~/.ssh/deploy_key
