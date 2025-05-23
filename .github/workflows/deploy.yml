@@ -12,6 +12,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'  # Automatischer npm cache
+    
+    - name: Cache node_modules
+      id: cache-modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
+    
+    - name: Install dependencies
+      if: steps.cache-modules.outputs.cache-hit != 'true'
+      run: npm ci
+    
     - name: Install sshpass
       run: sudo apt-get install -y sshpass
     
@@ -19,19 +38,18 @@ jobs:
       env:
         SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
       run: |
-        # Code zum Server kopieren
+        # Mit node_modules deployen (schneller auf Server)
         sshpass -e rsync -avz --delete \
           -e "ssh -o StrictHostKeyChecking=no" \
           --exclude '.git' \
           --exclude '.github' \
-          --exclude 'node_modules' \
           --exclude '.gitignore' \
           ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}/
     
-    - name: Install dependencies and restart
+    - name: Restart Node.js
       env:
         SSHPASS: ${{ secrets.MITTWALD_PASSWORD }}
       run: |
         sshpass -e ssh -o StrictHostKeyChecking=no \
           ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} \
-          "cd ${{ secrets.MITTWALD_PATH }} && npm install && mittnitectl job restart node"
+          "cd ${{ secrets.MITTWALD_PATH }} && mittnitectl job restart node"
