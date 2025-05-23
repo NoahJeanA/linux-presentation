@@ -13,7 +13,7 @@ The framework comes with a powerful feature set including [nested slides](https:
 
 ---
 
-lWaist to create reveal.js presentation in a graphical editor? Try <https://slides.com>. It's made by the same people behind reveal.js.
+Waist to create reveal.js presentation in a graphical editor? Try <https://slides.com>. It's made by the same people behind reveal.js.
 
 ---
 
