@@ -1,56 +1,23 @@
-name: Deploy to Mittwald
+name: Test Connection
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:  # Erlaubt manuelles Auslösen
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-    
-    - name: Install dependencies
+    - name: Debug SSH
       run: |
-        npm install
-        # Falls Sie einen Build-Prozess haben:
-        # npm run build
-    
-    - name: Setup SSH
-      run: |
-        # SSH-Verzeichnis erstellen
         mkdir -p ~/.ssh
-        
-        # Privaten Schlüssel speichern
         echo "${{ secrets.MITTWALD_SSH_KEY }}" > ~/.ssh/deploy_key
         chmod 600 ~/.ssh/deploy_key
         
-        # SSH bekannt machen
-        ssh-keyscan -H ${{ secrets.MITTWALD_HOST }} >> ~/.ssh/known_hosts
-    
-    - name: Test SSH Connection
-      run: |
-        ssh -i ~/.ssh/deploy_key ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} "echo 'SSH Connection successful!'"
-    
-    - name: Deploy to Mittwald
-      run: |
-        # Alle Dateien zum Server kopieren
-        rsync -avz --delete \
-          -e "ssh -i ~/.ssh/deploy_key" \
-          --exclude '.git' \
-          --exclude '.github' \
-          --exclude 'node_modules' \
-          --exclude '.DS_Store' \
-          ./ ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }}:${{ secrets.MITTWALD_PATH }}/
-    
-    - name: Cleanup
-      if: always()
-      run: rm -f ~/.ssh/deploy_key
+        # Fingerprint anzeigen
+        ssh-keygen -l -f ~/.ssh/deploy_key
+        
+        # Verbose connection test
+        ssh -vvv -i ~/.ssh/deploy_key \
+          -o StrictHostKeyChecking=no \
+          ${{ secrets.MITTWALD_USER }}@${{ secrets.MITTWALD_HOST }} \
+          "pwd && ls -la"
