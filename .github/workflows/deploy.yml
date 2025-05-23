@@ -3,7 +3,7 @@ name: Deploy Reveal.js to Mittwald
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
